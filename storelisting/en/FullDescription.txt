@@ -1,6 +1,6 @@
 Tired of music players that take forever to start up because they're loading ads or trying to download stuff? Of music players that ignore Bluetooth controls, or stop responding after a few minutes? I was too, so I wrote this app!
 
-The Pretty Good Music Player is an open source (GPL) folder-based music player with no frills. It's small, it's responsive, and it plays music. 
+The Pretty Great Music Player is an open source (GPL) folder-based music player with no frills. It's small, it's responsive, and it plays music.
 
 Feature Details:
 - New Feature! The color theme and text size are now configurable!
@@ -41,7 +41,7 @@ Compatibility:
 
 Legal Stuff:
 
-    Pretty Good Music Player
+    Pretty Great Music Player
     Copyright Tyler Smith 2014
 
     This program is free software: you can redistribute it and/or modify

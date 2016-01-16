@@ -1,57 +1,57 @@
-¿Cansado de reproductores de audio que tardan una eternidad en abrir debido a que cargan anuncios o tratan de descargas cosas? ¿Cansado de reproductores que ignoran los controles Bluetooth, o dejan de responder después de algunos minutos? Yo también lo estaba, así que escribí esta aplicación!
+ï¿½Cansado de reproductores de audio que tardan una eternidad en abrir debido a que cargan anuncios o tratan de descargas cosas? ï¿½Cansado de reproductores que ignoran los controles Bluetooth, o dejan de responder despuï¿½s de algunos minutos? Yo tambiï¿½n lo estaba, asï¿½ que escribï¿½ esta aplicaciï¿½n!
 
-El Pretty Good Music Player (Muy buen Reproductor de Música) es un programa de fuente abierta, que muestra tu música justo como la tienes acomodada en folders, no contiene extras innecesarios. Es un reproductor pequeño, que responde, y toca la música. 
+El Pretty Great Music Player (Muy buen Reproductor de Mï¿½sica) es un programa de fuente abierta, que muestra tu mï¿½sica justo como la tienes acomodada en folders, no contiene extras innecesarios. Es un reproductor pequeï¿½o, que responde, y toca la mï¿½sica.
 
 Especificaciones:
--Este reproductor te protege de pausas hechas por accidente cuando tus audífonos se salen. Agregué esta opción porque es molesto cuando el teléfono lo tengo en mi bolsillo y se auto-pausa porque los audífonos fueron desconectados.
-- Toca .mp3, .m4p, .m4a, .aac, y muchos más tipos de archivos de audio.
-- Acepta play, pausa, atrás, and siguiente comandos usados con Audífonos Bluetooth
-- Cuando seleccionas, “todas las canciones” de cierto artista, las canciones son ordenadas por album y no alfabéticamente.
-- Automáticamente pausa y resume cuando otra app necesita audio. (ejemplo: cuando el GPS necesita usar audio).
-- Si alguna otra app, necesita usar el audio por más de 30 segundos, (por ejemplo: una llamada telefónica), no resume automáticamente la música
+-Este reproductor te protege de pausas hechas por accidente cuando tus audï¿½fonos se salen. Agreguï¿½ esta opciï¿½n porque es molesto cuando el telï¿½fono lo tengo en mi bolsillo y se auto-pausa porque los audï¿½fonos fueron desconectados.
+- Toca .mp3, .m4p, .m4a, .aac, y muchos mï¿½s tipos de archivos de audio.
+- Acepta play, pausa, atrï¿½s, and siguiente comandos usados con Audï¿½fonos Bluetooth
+- Cuando seleccionas, ï¿½todas las cancionesï¿½ de cierto artista, las canciones son ordenadas por album y no alfabï¿½ticamente.
+- Automï¿½ticamente pausa y resume cuando otra app necesita audio. (ejemplo: cuando el GPS necesita usar audio).
+- Si alguna otra app, necesita usar el audio por mï¿½s de 30 segundos, (por ejemplo: una llamada telefï¿½nica), no resume automï¿½ticamente la mï¿½sica
 - "Repetir todo" siempre esta encendido.
-- Si pulsas en “atrás” muy rápido, hace un chequeo doble para verificar que te quieres salir de la aplicación.
+- Si pulsas en ï¿½atrï¿½sï¿½ muy rï¿½pido, hace un chequeo doble para verificar que te quieres salir de la aplicaciï¿½n.
 
 Forma en la que se ordenan los Archivos en folders:
-Está diseñado para trabajar con folders de artistas copiados de Itunes. Esto significa que busca esta estructura:
+Estï¿½ diseï¿½ado para trabajar con folders de artistas copiados de Itunes. Esto significa que busca esta estructura:
 
 musica/
    artista/
       /album1
-          /01 - Primera Canción.mp3
-          /02 - Segunda Canción.mp3
-          /03 - Tercera Canción.mp3
-          /04 - Cuarta Canción.mp3
+          /01 - Primera Canciï¿½n.mp3
+          /02 - Segunda Canciï¿½n.mp3
+          /03 - Tercera Canciï¿½n.mp3
+          /04 - Cuarta Canciï¿½n.mp3
       /album2
-          /01 - Otra Canción.mp3
+          /01 - Otra Canciï¿½n.mp3
       ....
 
 Nota:
-He notado que si pauso una canción por un periodo largo, necesito mantener presionado el botón de “pausa” en mis Audífonos Bluetooth  para lograr que resuma la canción.
+He notado que si pauso una canciï¿½n por un periodo largo, necesito mantener presionado el botï¿½n de ï¿½pausaï¿½ en mis Audï¿½fonos Bluetooth  para lograr que resuma la canciï¿½n.
 
-El código completo de esta app se encuentra disponible aquí: https://github.com/smithdtyler/prettygoodmusicplayer
+El cï¿½digo completo de esta app se encuentra disponible aquï¿½: https://github.com/smithdtyler/prettygoodmusicplayer
 
-El fantástico icono fue diseñado por Emily Krueger de Vine Creative: http://www.vinecreativemn.com/
+El fantï¿½stico icono fue diseï¿½ado por Emily Krueger de Vine Creative: http://www.vinecreativemn.com/
 
-Traducción al español por Jesús Alberto Guzmán Inzunza
+Traducciï¿½n al espaï¿½ol por Jesï¿½s Alberto Guzmï¿½n Inzunza
 
-Si tienes cualquier problema, por favor deja un mensaje con toda la información posible y trataré de resolverlo lo antes posible.
+Si tienes cualquier problema, por favor deja un mensaje con toda la informaciï¿½n posible y tratarï¿½ de resolverlo lo antes posible.
  
 Compatibilidad:
     Bluetooth control probado con un LG Electronics Tone+ HBS-730 Bluetooth Headset
 
 Legalidad:
 
-    Pretty Good Music Player
+    Pretty Great Music Player
     Derechos Reservados Tyler Smith 2014
 
     
-Este programa es software libre: puedes redistribuirlo y modificarlo bajo los términos de la licencia pública GNU publicada por la Fundación de Software Libre, ya sea la versión 3 de la Licencia, o cualquier posterior a tu favor.
+Este programa es software libre: puedes redistribuirlo y modificarlo bajo los tï¿½rminos de la licencia pï¿½blica GNU publicada por la Fundaciï¿½n de Software Libre, ya sea la versiï¿½n 3 de la Licencia, o cualquier posterior a tu favor.
 
 
-Este programa es distribuido con la esperanza de que sea útil, pero SIN NINGUNA GARANTÍA; sin implicar garantía de mercantibilidad o para cierto propósito, vea la licencia Pública General de GNU para más detalles.
+Este programa es distribuido con la esperanza de que sea ï¿½til, pero SIN NINGUNA GARANTï¿½A; sin implicar garantï¿½a de mercantibilidad o para cierto propï¿½sito, vea la licencia Pï¿½blica General de GNU para mï¿½s detalles.
 
-Vea http://www.gnu.org/licenses/  para una copia completa de la licencia Pública General de GNU
+Vea http://www.gnu.org/licenses/  para una copia completa de la licencia Pï¿½blica General de GNU
 
 Reddit:
 Yo escribo en Reddit como https://www.reddit.com/user/MythsBusted

@@ -1,5 +1,5 @@
 /**
-   The Pretty Good Music Player
+   The Pretty Great Music Player
    Copyright (C) 2014  Tyler Smith
  
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.smithdtyler.prettygoodmusicplayer;
+package de.dcja.prettygreatmusicplayer;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;

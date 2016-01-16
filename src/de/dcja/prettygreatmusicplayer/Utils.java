@@ -1,5 +1,5 @@
 /**
-   The Pretty Good Music Player
+   The Pretty Great Music Player
    Copyright (C) 2014  Tyler Smith
  
    This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,12 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.smithdtyler.prettygoodmusicplayer;
+package de.dcja.prettygreatmusicplayer;
 
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.Environment;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import java.util.Set;
 import libcore.net.MediaTypeUtils;
 
 /**
- * Utility functions for the Pretty Good Music Player
+ * Utility functions for the Pretty Great Music Player
  */
 public class Utils {
 	private static final String TAG = "Utils";

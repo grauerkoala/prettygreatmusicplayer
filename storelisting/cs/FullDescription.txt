@@ -1,6 +1,6 @@
 Jste již unaveni přehrávači hudby kterým trvá věčně než naběhnout, protože načítají reklamy a jiný obsah z webu? Unaveni přehrávači bez Bluetooth ovládání, nebo jejich neustálými pády po pár minutách? Já byl také a proto jsem napsal tuto aplikaci!
 
-Pretty Good Music Player je open source (GPL) přehrávač hudby pracující s adresáři, bez zbytečných okras. Je malý, je rychlý a přehrává hudbu. 
+Pretty Great Music Player je open source (GPL) přehrávač hudby pracující s adresáři, bez zbytečných okras. Je malý, je rychlý a přehrává hudbu.
 
 Přehled funkcí:
 - Nová funkce! Nyní se dá také měnit vzhled a velikost písma!
@@ -41,7 +41,7 @@ Kompatibilita:
 
 Licence:
 
-    Pretty Good Music Player
+    Pretty Great Music Player
     Copyright Tyler Smith 2014
 
     This program is free software: you can redistribute it and/or modify

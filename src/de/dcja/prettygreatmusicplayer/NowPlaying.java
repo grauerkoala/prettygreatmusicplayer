@@ -1,5 +1,5 @@
 /**
-   The Pretty Good Music Player
+   The Pretty Great Music Player
    Copyright (C) 2014  Tyler Smith
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.smithdtyler.prettygoodmusicplayer;
+package de.dcja.prettygreatmusicplayer;
 
 import java.util.Locale;
 
@@ -51,8 +51,6 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-
-import com.smithdtyler.prettygoodmusicplayer.MusicPlaybackService.PlaybackState;
 
 public class NowPlaying extends Activity {
 
@@ -459,15 +457,15 @@ public class NowPlaying extends Activity {
 					shuffle.setSelected(isShuffling);
 				}
 
-				PlaybackState state = PlaybackState.values()[msg.getData().getInt(MusicPlaybackService.PLAYBACK_STATE, 0)];
+				MusicPlaybackService.PlaybackState state = MusicPlaybackService.PlaybackState.values()[msg.getData().getInt(MusicPlaybackService.PLAYBACK_STATE, 0)];
 				ImageButton playPause = (ImageButton)_activity.findViewById(R.id.playPause);
 				if(playPause.getContentDescription().equals(_activity.getResources().getString(R.string.play))){
-					if(state == PlaybackState.PLAYING){
+					if(state == MusicPlaybackService.PlaybackState.PLAYING){
 						playPause.setImageDrawable(_activity.getResources().getDrawable(R.drawable.ic_action_pause));
 						playPause.setContentDescription(_activity.getResources().getString(R.string.pause));
 					}
 				} else {
-					if(state == PlaybackState.PAUSED){
+					if(state == MusicPlaybackService.PlaybackState.PAUSED){
 						playPause.setImageDrawable(_activity.getResources().getDrawable(R.drawable.ic_action_play));
 						playPause.setContentDescription(_activity.getResources().getString(R.string.play));
 					}

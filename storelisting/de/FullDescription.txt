@@ -2,7 +2,7 @@ Genervt von Musikspielern mit langen Ladezeiten, weil die App Werbeanzeigen lade
 
 War ich auch, deshalb schrieb ich diese App!
 
-Der Pretty Good Music Player ist ein Open Source (GPL), Verzeichnis orientierter Spieler ohne Schnickschnack. 
+Der Pretty Great Music Player ist ein Open Source (GPL), Verzeichnis orientierter Spieler ohne Schnickschnack.
 
 Er ist klein, er ist schnell, und er spielt Musik.
 
