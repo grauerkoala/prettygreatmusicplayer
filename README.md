@@ -1,21 +1,33 @@
-prettygoodmusicplayer
+prettygreatmusicplayer
 =====================
 
-A music player for Android that hits the basics hard
+This is a fork of pretty<b>good</b>musicplayer which can be found 
+[here](https://github.com/smithdtyler/prettygoodmusicplayer). If you are looking for a music player 
+that's ready to use, prettygreatmusicplayer is not for you; please check out the original project 
+(link above) instead.
 
-I do my best to address issues when they arise, but I'm pretty busy, so it may take a long time for me to push updates.
+Basically, I am using this fork as a playground of sorts to experiment with features of Android app 
+development. Also, I'm trying to adjust the app to match exactly my needs. Therefore, although 
+suggestions are very much welcome, there is a good chance they won't be met with any priority 
+treatment or at all. Bug reports are of course much appreciated, however there is a good chance 
+it'll take a while for me to get around to fixing them (feel free to do that as well, if you feel 
+like it, and give me a buzz!).
 
-If you're having troubles with media button presses being ignored, check out Media Button Router: https://github.com/harleensahni/media-button-router
+Development is happening using Android Studio (as opposed to Eclipse used for 
+prettygoodmusicplayer).
 
-Building: 
-I've been building this in Eclipse. For Android Studio do 'Import Project' -> select build.gradle -> click 'Yes' for the gradle wrapper (or choose your own gradle folder. Wrapper is recommended as AStudio is finicky about which version it uses)
+There will probably be a good amount of inspiration taken from MortPlayer which is rather neat
+(not perfect), but sadly isn't open source software.
 
 
-Installing:
-The production version is available here:
+## Wishlist
 
-Google Play: https://play.google.com/store/apps/details?id=com.smithdtyler.prettygoodmusicplayer
+Stuff that I'd like to add to the player. Apologies for any descriptions that don't seem to make any
+sense, they're mostly meant as a reminder for what I've planned.
 
-F-Droid: https://f-droid.org/repository/browse/?fdfilter=pretty+good+music+player&fdid=com.smithdtyler.prettygoodmusicplayer
-
-Amazon: http://www.amazon.com/gp/product/B00Q9OOQBK
+* Widget!
+    * Lock Screen Widget!
+* Playlist support
+* Queueing of files / directories
+    * Display of the current queue
+* Full usage of tag information (very much low priority because mostly for shininess.
