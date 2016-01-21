@@ -54,6 +54,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -111,6 +112,7 @@ public class MusicPlaybackService extends Service {
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
 	private MediaPlayer mp;
+	private OnDemandMediaMetadataRetriever onDemandMediaMetadataRetriever;
 	private static final String TAG = "MusicPlaybackService";
 	private static boolean isRunning = false;
 
@@ -191,6 +193,8 @@ public class MusicPlaybackService extends Service {
 			}
 
 		});
+
+		onDemandMediaMetadataRetriever = new OnDemandMediaMetadataRetriever();
 
 		// https://developer.android.com/training/managing-audio/audio-focus.html
 		audioFocusListener = new PrettyGoodAudioFocusChangeListener();
@@ -425,11 +429,10 @@ public class MusicPlaybackService extends Service {
 		Bundle b = new Bundle();
 		if (songFile != null) {
 			// First try to retrieve metadata from file
-			MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-			mediaMetadataRetriever.setDataSource(songFile.getPath());
-			String prettySongName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-			String prettyAlbumName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-			String prettyArtistName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+			onDemandMediaMetadataRetriever.setDataSource(songFile.getPath());
+			String prettySongName = onDemandMediaMetadataRetriever.retrieveMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+			String prettyAlbumName = onDemandMediaMetadataRetriever.retrieveMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+			String prettyArtistName = onDemandMediaMetadataRetriever.retrieveMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
 			b.putString(PRETTY_SONG_NAME,
 					(prettySongName != null) ? prettySongName : Utils.getPrettySongName(songFile));
 			b.putString(PRETTY_ALBUM_NAME,
@@ -912,6 +915,39 @@ public class MusicPlaybackService extends Service {
 							"It's been more than 30 seconds or we were paused, don't auto-play");
 				}
 			}
+		}
+	}
+
+	private static class OnDemandMediaMetadataRetriever {
+		/**
+		 * Since it's only necessary to fetch metadata once the media file has changed, this class
+		 * will only look up new metadata if the file is different from the last time metadata has
+		 * been looked up.
+		 */
+
+		private MediaMetadataRetriever mediaMetadataRetriever;
+
+		private String latestFileName;
+
+		private HashMap<Integer, String> retrievedMetadata;
+
+		public OnDemandMediaMetadataRetriever() {
+			mediaMetadataRetriever = new MediaMetadataRetriever();
+			retrievedMetadata = new HashMap<>();
+		}
+
+		public void setDataSource(String fileName) {
+			if (!fileName.equals(latestFileName)) {
+				retrievedMetadata.clear();
+				latestFileName = fileName;
+				mediaMetadataRetriever.setDataSource(fileName);
+			}
+		}
+
+		public String retrieveMetadata(int keyCode) {
+			if (!retrievedMetadata.containsKey(keyCode))
+				retrievedMetadata.put(keyCode, mediaMetadataRetriever.extractMetadata(keyCode));
+			return retrievedMetadata.get(keyCode);
 		}
 	}
 
