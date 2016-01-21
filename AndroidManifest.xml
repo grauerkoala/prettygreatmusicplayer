@@ -51,6 +51,13 @@
             android:exported="true"
         >
         </activity>
+
+        <!--<activity android:name="de.dcja.prettygreatmusicplayer.MusicControlWidgetConfigure">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>-->
+
         <!-- The service has android:exported="true" because that's needed for
         control from the notification. Not sure why it causes a warning... -->
         <service 
@@ -64,6 +71,15 @@
             <intent-filter android:priority="2147483647" >
                <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
+        </receiver>
+
+        <receiver android:name="PlayerControlWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="de.dcja.prettygreatmusicplayer.PLAYBACK_STATUS_CHANGED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/playercontrol_widget_info" />
         </receiver>
     </application>
 

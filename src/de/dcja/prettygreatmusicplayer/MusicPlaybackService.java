@@ -31,6 +31,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
@@ -401,6 +402,7 @@ public class MusicPlaybackService extends Service {
 		}
 		updateResumePosition();
 		sendUpdateToClients();
+		sendUpdateToWidgets();
 	}
 
 	private void updateResumePosition(){
@@ -419,43 +421,54 @@ public class MusicPlaybackService extends Service {
 		}
 	}
 
+	private Bundle compileUpdateBundle() {
+		Bundle b = new Bundle();
+		if (songFile != null) {
+			// First try to retrieve metadata from file
+			MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+			mediaMetadataRetriever.setDataSource(songFile.getPath());
+			String prettySongName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+			String prettyAlbumName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+			String prettyArtistName = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+			b.putString(PRETTY_SONG_NAME,
+					(prettySongName != null) ? prettySongName : Utils.getPrettySongName(songFile));
+			b.putString(PRETTY_ALBUM_NAME,
+					(prettyAlbumName != null) ? prettyAlbumName : songFile.getParentFile().getName());
+			b.putString(PRETTY_ARTIST_NAME,
+					(prettyArtistName != null) ? prettyArtistName : songFile.getParentFile().getParentFile().getName());
+		} else {
+			// songFile can be null while we're shutting down.
+			b.putString(PRETTY_SONG_NAME, " ");
+			b.putString(PRETTY_ALBUM_NAME, " ");
+			b.putString(PRETTY_ARTIST_NAME, " ");
+		}
+
+		b.putBoolean(IS_SHUFFLING, this._shuffle);
+
+		if (mp.isPlaying()) {
+			b.putInt(PLAYBACK_STATE, PlaybackState.PLAYING.ordinal());
+		} else {
+			b.putInt(PLAYBACK_STATE, PlaybackState.PAUSED.ordinal());
+		}
+		// We might not be able to send the position right away if mp is
+		// still being created
+		// so instead let's send the last position we knew about.
+		if (mp.isPlaying()) {
+			lastDuration = mp.getDuration();
+			lastPosition = mp.getCurrentPosition();
+		}
+		b.putInt(TRACK_DURATION, lastDuration);
+		b.putInt(TRACK_POSITION, lastPosition);
+
+		return b;
+	}
 
 	private void sendUpdateToClients() {
 		List<Messenger> toRemove = new ArrayList<Messenger>();
 		synchronized (mClients) {
 			for (Messenger client : mClients) {
 				Message msg = Message.obtain(null, MSG_SERVICE_STATUS);
-				Bundle b = new Bundle();
-				if (songFile != null) {
-					b.putString(PRETTY_SONG_NAME,
-							Utils.getPrettySongName(songFile));
-					b.putString(PRETTY_ALBUM_NAME, songFile.getParentFile()
-							.getName());
-					b.putString(PRETTY_ARTIST_NAME, songFile.getParentFile()
-							.getParentFile().getName());
-				} else {
-					// songFile can be null while we're shutting down.
-					b.putString(PRETTY_SONG_NAME, " ");
-					b.putString(PRETTY_ALBUM_NAME, " ");
-					b.putString(PRETTY_ARTIST_NAME, " ");
-				}
-
-				b.putBoolean(IS_SHUFFLING, this._shuffle);
-
-				if (mp.isPlaying()) {
-					b.putInt(PLAYBACK_STATE, PlaybackState.PLAYING.ordinal());
-				} else {
-					b.putInt(PLAYBACK_STATE, PlaybackState.PAUSED.ordinal());
-				}
-				// We might not be able to send the position right away if mp is
-				// still being created
-				// so instead let's send the last position we knew about.
-				if (mp.isPlaying()) {
-					lastDuration = mp.getDuration();
-					lastPosition = mp.getCurrentPosition();
-				}
-				b.putInt(TRACK_DURATION, lastDuration);
-				b.putInt(TRACK_POSITION, lastPosition);
+				Bundle b = compileUpdateBundle();
 				msg.setData(b);
 				try {
 					client.send(msg);
@@ -469,6 +482,13 @@ public class MusicPlaybackService extends Service {
 				mClients.remove(remove);
 			}
 		}
+	}
+
+	private void sendUpdateToWidgets() {
+		Bundle b = compileUpdateBundle();
+		Intent intent = new Intent(PlayerControlWidgetProvider.ACTION_PLAYBACK_STATUS_CHANGED);
+		intent.putExtra("updateInfo", b);
+		getApplicationContext().sendBroadcast(intent);
 	}
 
 	public static boolean isRunning() {
