@@ -2,11 +2,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory
         android:title="@string/file_preferences_title">
-        <Preference 
-            android:key="choose_music_directory_prompt"
-            android:title="@string/choose_music_directory_prompt" 
-            android:summary="@string/choose_music_directory_summary"
-            android:icon="@android:drawable/ic_menu_set_as"/>
+		<Preference
+			android:key="choose_music_directory_prompt"
+			android:title="@string/choose_music_directory_prompt"
+			android:summary="@string/choose_music_directory_summary"
+			android:icon="@android:drawable/ic_menu_set_as"/>
+		<Preference
+			android:key="rescan_music_directory"
+			android:title="@string/rescan_music_directory"
+			android:summary="@string/rescan_music_directory_summary"
+			android:icon="@android:drawable/ic_popup_sync"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/podcasts_and_audiobooks_title">

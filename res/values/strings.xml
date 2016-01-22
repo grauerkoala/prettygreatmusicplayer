@@ -18,6 +18,7 @@
     <string name="shuffle">Shuffle</string>
     <string name="nothing_playing">Nothing Playing</string>
     <string name="exit">Exit</string>
+    <string name="cancel">Cancel</string>
     
     <!-- *********** -->
     <!-- Preferences -->
@@ -27,6 +28,10 @@
     <string name="file_preferences_title">File Preferences</string>
     <string name="choose_music_directory_prompt">Choose Music Directory</string>
     <string name="choose_music_directory_summary">Pick the Directory Containing Your Artists</string>
+    <string name="rescan_music_directory">Rescan Music Directory</string>
+    <string name="rescan_music_directory_summary">Scan the metadata of all music files in the music directory (necessary for global shuffling, may save battery life afterwards)</string>
+    <string name="rescan_dialog_title">Scanning Music</string>
+    <string name="rescan_dialog_counting">Retrieving list of files...</string>
 	<string name="directorydialogprompt">Where are your artist folders?</string>
     <string name="directorydialoghere">Right Here!</string>
     <string name="directorydialogup">Go up a directory</string>

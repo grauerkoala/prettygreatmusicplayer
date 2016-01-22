@@ -18,9 +18,6 @@
 
 package de.dcja.prettygreatmusicplayer;
 
-import java.io.File;
-import java.util.List;
-
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -37,6 +34,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -109,6 +109,14 @@ public class SettingsActivity extends PreferenceActivity {
 					this, path);
 			picker.showDirectoryPicker();
 			Log.i(TAG, "User selected " + picker.path);
+			return true;
+		}
+
+		if (preference.getKey().equals("rescan_music_directory")) {
+			SharedPreferences prefs = getSharedPreferences("PrettyGoodMusicPlayer", MODE_PRIVATE);
+			String path = prefs.getString("ARTIST_DIRECTORY", Utils.getBestGuessMusicDirectory().getAbsolutePath());
+			File directory = new File(path);
+			SongScanner.rescanMusic(this, directory);
 			return true;
 		}
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
