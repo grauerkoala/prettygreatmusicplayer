@@ -33,6 +33,9 @@ public class PlayerControlWidgetProvider extends AppWidgetProvider {
                 views.setTextViewText(R.id.songTitle, playbackInfo.getString(MusicPlaybackService.PRETTY_SONG_NAME));
                 views.setTextViewText(R.id.songArtist, playbackInfo.getString(MusicPlaybackService.PRETTY_ARTIST_NAME));
                 views.setTextViewText(R.id.songAlbum, playbackInfo.getString(MusicPlaybackService.PRETTY_ALBUM_NAME));
+                views.setProgressBar(R.id.songProgress,
+                        playbackInfo.getInt(MusicPlaybackService.TRACK_DURATION),
+                        playbackInfo.getInt(MusicPlaybackService.TRACK_POSITION), false);
             }
 
             // Tell the AppWidgetManager to perform an update on the current app widget
