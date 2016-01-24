@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.RemoteViews;
 
 public class PlayerControlWidgetProvider extends AppWidgetProvider {
@@ -25,18 +26,23 @@ public class PlayerControlWidgetProvider extends AppWidgetProvider {
             Intent intent = new Intent(context, NowPlaying.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-            // Get the layout for the App Widget and attach an on-click listener
-            // to the button
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_player_control);
-            if (playbackInfo != null) {
-                views.setOnClickPendingIntent(R.id.playButton, pendingIntent);
-                views.setTextViewText(R.id.songTitle, playbackInfo.getString(MusicPlaybackService.PRETTY_SONG_NAME));
-                views.setTextViewText(R.id.songArtist, playbackInfo.getString(MusicPlaybackService.PRETTY_ARTIST_NAME));
-                views.setTextViewText(R.id.songAlbum, playbackInfo.getString(MusicPlaybackService.PRETTY_ALBUM_NAME));
-                views.setProgressBar(R.id.songProgress,
-                        playbackInfo.getInt(MusicPlaybackService.TRACK_DURATION),
-                        playbackInfo.getInt(MusicPlaybackService.TRACK_POSITION), false);
+            if (playbackInfo != null && playbackInfo.getInt(MusicPlaybackService.TRACK_DURATION) > 0) {
+                String songName = playbackInfo.getString(MusicPlaybackService.PRETTY_SONG_NAME);
+                String artistName = playbackInfo.getString(MusicPlaybackService.PRETTY_ARTIST_NAME);
+                String albumName = playbackInfo.getString(MusicPlaybackService.PRETTY_ALBUM_NAME);
+                int trackDuration = playbackInfo.getInt(MusicPlaybackService.TRACK_DURATION);
+                int trackPosition = playbackInfo.getInt(MusicPlaybackService.TRACK_POSITION);
+                views.setTextViewText(R.id.songTitle, songName);
+                views.setTextViewText(R.id.songArtist, artistName);
+                views.setTextViewText(R.id.songAlbum, albumName);
+                setWidgetMode(context, views, true);
+                views.setProgressBar(R.id.songProgress, trackDuration, trackPosition, false);
+            } else {
+                setWidgetMode(context, views, false);
             }
+
+            views.setOnClickPendingIntent(R.id.widget_inactive_view, pendingIntent);
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -49,8 +55,7 @@ public class PlayerControlWidgetProvider extends AppWidgetProvider {
         if (intent.getAction().equals(ACTION_PLAYBACK_STATUS_CHANGED)) {
             Bundle b = intent.getBundleExtra("updateInfo");
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_player_control);
-            // Doesn't work for some reason
-            // views.setTextViewText(R.id.songTitle, b.getString(MusicPlaybackService.PRETTY_SONG_NAME));
+            // For some reason, manipulating views here doesn't work, so we'll have to save the bundle
             playbackInfo = b;
 
             // Update widgets
@@ -58,5 +63,12 @@ public class PlayerControlWidgetProvider extends AppWidgetProvider {
             int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, PlayerControlWidgetProvider.class));
             this.onUpdate(context, appWidgetManager, appWidgetIds);
         }
+    }
+
+    private void setWidgetMode(Context context, RemoteViews views, boolean active) {
+        for (int view : new int[]{R.id.songProgress, R.id.widget_active_view}) {
+            views.setViewVisibility(view, active ? View.VISIBLE : View.GONE);
+        }
+        views.setViewVisibility(R.id.widget_inactive_view, active ? View.GONE : View.VISIBLE);
     }
 }

@@ -19,6 +19,7 @@
     <string name="nothing_playing">Nothing Playing</string>
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
+    <string name="widget_stopped_label">Pretty Great Music Player (inactive)</string>
     
     <!-- *********** -->
     <!-- Preferences -->

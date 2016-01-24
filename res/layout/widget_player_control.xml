@@ -8,22 +8,26 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:id="@+id/widget_active_view">
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/playButton"
             android:src="@android:drawable/ic_media_play"
-            android:background="@null" />
+            android:background="@null"
+            android:layout_gravity="center_vertical" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Song Title"
                 android:id="@+id/songTitle"
@@ -50,6 +54,16 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="@string/widget_stopped_label"
+        android:id="@+id/widget_inactive_view"
+        android:textStyle="bold"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:visibility="gone" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
