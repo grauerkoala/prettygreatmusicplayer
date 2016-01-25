@@ -153,7 +153,7 @@ public class SongScanner {
         Log.i(TAG, "Handling: " + artist + " - " + album + " - " + songTitle + " (" + filePath + ")");
 
         // Retrieve artist_id; add artist if not yet present
-        long artist_id = -1;
+        long artist_id;
         cursor = db.query(MusicDataContract.Artist.TABLE_NAME,
                 new String[]{MusicDataContract.Artist.COLUMN_NAME_ARTIST_ID},
                 MusicDataContract.Artist.COLUMN_NAME_ARTIST_NAME + " = ?",
@@ -178,7 +178,7 @@ public class SongScanner {
         cursor.close();
 
         // Retrieve album_id; add album if not yet present
-        long album_id = -1;
+        long album_id;
         cursor = db.query(MusicDataContract.Album.TABLE_NAME,
                 new String[]{MusicDataContract.Album.COLUMN_NAME_ALBUM_ID},
                 MusicDataContract.Album.COLUMN_NAME_ALBUM_NAME + " = ? AND " +
@@ -194,7 +194,7 @@ public class SongScanner {
             ContentValues contentValues = new ContentValues();
             contentValues.put(MusicDataContract.Album.COLUMN_NAME_ALBUM_NAME, album);
             contentValues.put(MusicDataContract.Album.COLUMN_NAME_ARTIST_ID, artist_id);
-            artist_id = db.insert(MusicDataContract.Album.TABLE_NAME, null, contentValues);
+            album_id = db.insert(MusicDataContract.Album.TABLE_NAME, null, contentValues);
             Log.i(TAG, "Album \"" + album + "\" was added. New ID: " + album_id);
         } else {
             // This shouldn't happen
@@ -204,7 +204,7 @@ public class SongScanner {
         cursor.close();
 
         // If file is present already, update it. Otherwise add it
-        long song_id = -1;
+        long song_id;
         cursor = db.query(MusicDataContract.Song.TABLE_NAME,
                 new String[]{MusicDataContract.Song.COLUMN_NAME_SONG_ID},
                 MusicDataContract.Song.COLUMN_NAME_FILE_PATH + " = ?",
