@@ -118,7 +118,7 @@ import java.util.Map;
         	baseDir = prefDir;
         	populateArtists(baseDir);
             
-            simpleAdpt = new SimpleAdapter(this, artists,  R.layout.pgmp_list_item, new String[] {"artist"}, new int[] {R.id.PGMPListItemText});
+            simpleAdpt = new SimpleAdapter(this, artists,  R.layout.pgmp_list_item_directory, new String[] {"artist"}, new int[] {R.id.PGMPListItemText});
             lv.setAdapter(simpleAdpt);
         }
         
@@ -172,7 +172,7 @@ import java.util.Map;
 
         populateArtists(baseDir);
         
-        simpleAdpt = new SimpleAdapter(this, artists, R.layout.pgmp_list_item, new String[] {"artist"}, new int[] {R.id.PGMPListItemText});
+        simpleAdpt = new SimpleAdapter(this, artists, R.layout.pgmp_list_item_directory, new String[] {"artist"}, new int[] {R.id.PGMPListItemText});
         ListView lv = (ListView) findViewById(R.id.artistListView);
         lv.setAdapter(simpleAdpt);
     }

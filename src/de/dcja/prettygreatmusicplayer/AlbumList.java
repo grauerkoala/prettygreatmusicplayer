@@ -149,7 +149,7 @@ public class AlbumList extends AbstractMusicList {
 	    final String artistPath = intent.getStringExtra(ArtistList.ARTIST_ABS_PATH_NAME);
 	    populateAlbums(artist, artistPath);
         
-        listAdapter = new SimpleAdapter(this, albums, R.layout.pgmp_list_item, new String[] {"album"}, new int[] {R.id.PGMPListItemText});
+        listAdapter = new SimpleAdapter(this, albums, R.layout.pgmp_list_item_directory, new String[] {"album"}, new int[] {R.id.PGMPListItemText});
 	    ListView lv = (ListView) findViewById(R.id.albumListView);
         lv.setAdapter(listAdapter);
         

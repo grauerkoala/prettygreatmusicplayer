@@ -33,6 +33,8 @@
     <string name="rescan_music_directory_summary">Scan the metadata of all music files in the music directory (necessary for global shuffling, may save battery life afterwards)</string>
     <string name="rescan_dialog_title">Scanning Music</string>
     <string name="rescan_dialog_counting">Retrieving list of files...</string>
+    <string name="metadata_fallback_to_file">Read metadata from file</string>
+    <string name="metadata_fallback_to_file_summary">Allow reading of metadata from file if it hasn\'t been scanned yet (may or may not decrease performance)</string>
 	<string name="directorydialogprompt">Where are your artist folders?</string>
     <string name="directorydialoghere">Right Here!</string>
     <string name="directorydialogup">Go up a directory</string>

@@ -12,6 +12,11 @@
 			android:title="@string/rescan_music_directory"
 			android:summary="@string/rescan_music_directory_summary"
 			android:icon="@android:drawable/ic_popup_sync"/>
+		<CheckBoxPreference
+			android:key="pref_metadata_fallback_to_file"
+			android:title="@string/metadata_fallback_to_file"
+			android:summary="@string/metadata_fallback_to_file_summary"
+			android:defaultValue="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/podcasts_and_audiobooks_title">

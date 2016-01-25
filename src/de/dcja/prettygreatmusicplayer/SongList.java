@@ -56,7 +56,7 @@ public class SongList extends AbstractMusicList {
 	private File albumDir;
 	private boolean audiobookMode;
 
-	private void populateSongs(String artistName, String albumDirName, String artistAbsDirName){
+	private void populateSongs(String artistName, String albumDirName, String artistAbsDirName, boolean fallbackToFile){
 		
 		songs = new ArrayList<Map<String,String>>();
 		
@@ -128,11 +128,20 @@ public class SongList extends AbstractMusicList {
 			Collections.sort(songFilesInArtistList, Utils.songFileComparator);
 			songFiles.addAll(songFilesInArtistList);
 		}
-		
-		for(File song : songFiles){
-			Log.v(TAG, "Adding song " + song);
+
+		MusicInfoRetriever musicInfoRetriever = new MusicInfoRetriever(this, fallbackToFile);
+
+		for(File songFile : songFiles){
+			Log.v(TAG, "Adding song " + songFile);
 			Map<String,String> map = new HashMap<String, String>();
-			map.put("song", Utils.getPrettySongName(song));			
+			String filePath = songFile.getAbsolutePath();
+			musicInfoRetriever.setDataSource(filePath);
+			String artist = musicInfoRetriever.getArtist();
+			String album = musicInfoRetriever.getAlbum();
+			String song = musicInfoRetriever.getSong();
+			map.put("file", song.isEmpty() ? "" : songFile.getName());
+			map.put("name", song.isEmpty() ? songFile.getName() : song);
+			map.put("artist_album", artist + (album.isEmpty() ? "" : " (" + musicInfoRetriever.getAlbum() + ")"));
 			songs.add(map);
 		}
 		
@@ -226,10 +235,13 @@ public class SongList extends AbstractMusicList {
 		setContentView(R.layout.activity_song_list);
 		
 	    Log.i(TAG, "Getting songs for " + album);
+
+		boolean fallbackToFile = sharedPref.getBoolean("pref_metadata_fallback_to_file", false);
+	    populateSongs(artistName, album, artistDir, fallbackToFile);
 	    
-	    populateSongs(artistName, album, artistDir);
-	    
-        simpleAdpt = new SimpleAdapter(this, songs, R.layout.pgmp_list_item, new String[] {"song"}, new int[] {R.id.PGMPListItemText});
+        simpleAdpt = new SimpleAdapter(this, songs, R.layout.pgmp_list_item_file,
+				new String[] {"file", "name", "artist_album"},
+				new int[] {R.id.PGMPListItemText, R.id.PGMPListItemName, R.id.PGMPListItemArtistAlbum});
         ListView lv = (ListView) findViewById(R.id.songListView);
         lv.setAdapter(simpleAdpt);
         
