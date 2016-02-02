@@ -1,11 +1,17 @@
 package de.dcja.prettygreatmusicplayer;
 
+import android.content.Context;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+// TODO: consider implementing this instead:
+// https://stackoverflow.com/questions/5467174/how-to-implement-a-repeating-shuffle-thats-random-but-not-too-random
 
 /**
  * Handles composition and navigation of a playlist.
@@ -109,7 +115,7 @@ public class Playlist {
         if (playlist.size() == 0) {
             return -1;
         }
-        position = (position - 1) % playlist.size();
+        position = (playlist.size() + position - 1) % playlist.size();
         playing = shuffling ? playorder.get(position) : playlist.get(position);
         return playing.position;
     }
@@ -177,10 +183,37 @@ public class Playlist {
         }
     }
 
+    public boolean toggleShuffling() {
+        setShuffling(!isShuffling());
+        return isShuffling();
+    }
+
+    public static Playlist getPlaylistForFilePaths(Context context, String[] filePaths) {
+        Playlist playlist = new Playlist();
+        MusicInfoRetriever musicInfoRetriever = new MusicInfoRetriever(context, false); // TODO: Make fallback to file parameter dependent on settings
+
+        for (String filePath : filePaths) {
+            musicInfoRetriever.setDataSource(filePath);
+            String artist = musicInfoRetriever.getArtist();
+            String album = musicInfoRetriever.getAlbum();
+            String songTitle = musicInfoRetriever.getSong();
+
+            if (songTitle.isEmpty()) {
+                File f = new File(filePath);
+                songTitle = f.getName();
+            }
+
+            Song song = new Playlist.Song(filePath, artist, album, songTitle);
+            playlist.appendSong(song);
+        }
+
+        return playlist;
+    }
+
     /**
      * Contains a path to a song file and associated metadata
      */
-    public class Song {
+    public static class Song {
         private final String fileName;
         private final String artist;
         private final String album;
