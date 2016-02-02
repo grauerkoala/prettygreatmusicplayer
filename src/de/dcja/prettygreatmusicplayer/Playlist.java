@@ -252,6 +252,7 @@ public class Playlist {
 
         public PlaylistItem(Song song, int position) {
             this.song = song;
+            this.position = position;
         }
     }
 }
