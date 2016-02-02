@@ -34,7 +34,6 @@ import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -103,8 +102,6 @@ public class MusicPlaybackService extends Service {
 
 	private FileInputStream fis;
 	private File songFile;
-	private String[] songAbsoluteFileNames;
-	private int songAbsoluteFileNamesPosition;
 
 	private Timer timer;
 
@@ -214,9 +211,6 @@ public class MusicPlaybackService extends Service {
 		// https://stackoverflow.com/questions/6406730/updating-an-ongoing-notification-quietly/15538209#15538209
 		Intent resultIntent = new Intent(this, NowPlaying.class);
 		resultIntent.putExtra("From_Notification", true);
-		resultIntent.putExtra(AlbumList.ALBUM_NAME, album);
-		resultIntent.putExtra(ArtistList.ARTIST_NAME, artist);
-		resultIntent.putExtra(ArtistList.ARTIST_ABS_PATH_NAME, artistAbsPath);
 
 		// Use the FLAG_ACTIVITY_CLEAR_TOP to prevent launching a second
 		// NowPlaying if one already exists.
@@ -371,19 +365,14 @@ public class MusicPlaybackService extends Service {
 				break;
 			case MSG_SET_PLAYLIST:
 				Log.i(TAG, "Got a set playlist message!");
-				_service.songAbsoluteFileNames = msg.getData().getStringArray(
-						SongList.SONG_ABS_FILE_NAME_LIST);
-				_service.songAbsoluteFileNamesPosition = msg.getData().getInt(
-						SongList.SONG_ABS_FILE_NAME_LIST_POSITION);
-				_service.songFile = new File(
-						_service.songAbsoluteFileNames[_service.songAbsoluteFileNamesPosition]);
-				_service.artist = msg.getData().getString(ArtistList.ARTIST_NAME);
-				_service.artistAbsPath = msg.getData().getString(ArtistList.ARTIST_ABS_PATH_NAME);
-				_service.album = msg.getData().getString(AlbumList.ALBUM_NAME);
+				Playlist playlist = Playlist.getPlaylistForFilePaths(_service,
+						msg.getData().getStringArray(SongList.SONG_ABS_FILE_NAME_LIST));
+				PlaybackInfoHolder.getInstance().setActivePlaylist(playlist);
+				playlist.selectSong(msg.getData().getInt(SongList.SONG_ABS_FILE_NAME_LIST_POSITION));
+				_service.songFile = new File(playlist.getPlaying().getFileName());
 				int songPosition = msg.getData().getInt(TRACK_POSITION, 0);
 				_service.startPlayingFile(songPosition);
 				_service.updateNotification();
-				_service.resetShuffle();
 				break;
 			case MSG_REQUEST_STATE:
 				Log.i(TAG, "Got a state request message!");
@@ -404,9 +393,21 @@ public class MusicPlaybackService extends Service {
 		if (pauseTime < currentTime) {
 			pause();
 		}
+		updatePlaybackInfo();
 		updateResumePosition();
 		sendUpdateToClients();
 		sendUpdateToWidgets();
+	}
+
+	private void updatePlaybackInfo() {
+		PlaybackInfoHolder pih = PlaybackInfoHolder.getInstance();
+		synchronized (pih) {
+			pih.setPlaybackState(mp.isPlaying() ? PlaybackState.PLAYING : PlaybackState.PAUSED);
+			if (mp.isPlaying()) {
+				pih.setTrackDuration(mp.getDuration());
+				pih.setTrackPosition(mp.getCurrentPosition());
+			}
+		}
 	}
 
 	private void updateResumePosition(){
@@ -425,54 +426,11 @@ public class MusicPlaybackService extends Service {
 		}
 	}
 
-	private Bundle compileUpdateBundle() {
-		Bundle b = new Bundle();
-		if (songFile != null) {
-			// First try to retrieve metadata from file
-			onDemandMediaMetadataRetriever.setDataSource(songFile.getPath());
-			String prettySongName = onDemandMediaMetadataRetriever.retrieveMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-			String prettyAlbumName = onDemandMediaMetadataRetriever.retrieveMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-			String prettyArtistName = onDemandMediaMetadataRetriever.retrieveMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-			b.putString(PRETTY_SONG_NAME,
-					(prettySongName != null) ? prettySongName : Utils.getPrettySongName(songFile));
-			b.putString(PRETTY_ALBUM_NAME,
-					(prettyAlbumName != null) ? prettyAlbumName : songFile.getParentFile().getName());
-			b.putString(PRETTY_ARTIST_NAME,
-					(prettyArtistName != null) ? prettyArtistName : songFile.getParentFile().getParentFile().getName());
-		} else {
-			// songFile can be null while we're shutting down.
-			b.putString(PRETTY_SONG_NAME, " ");
-			b.putString(PRETTY_ALBUM_NAME, " ");
-			b.putString(PRETTY_ARTIST_NAME, " ");
-		}
-
-		b.putBoolean(IS_SHUFFLING, this._shuffle);
-
-		if (mp.isPlaying()) {
-			b.putInt(PLAYBACK_STATE, PlaybackState.PLAYING.ordinal());
-		} else {
-			b.putInt(PLAYBACK_STATE, PlaybackState.PAUSED.ordinal());
-		}
-		// We might not be able to send the position right away if mp is
-		// still being created
-		// so instead let's send the last position we knew about.
-		if (mp.isPlaying()) {
-			lastDuration = mp.getDuration();
-			lastPosition = mp.getCurrentPosition();
-		}
-		b.putInt(TRACK_DURATION, lastDuration);
-		b.putInt(TRACK_POSITION, lastPosition);
-
-		return b;
-	}
-
 	private void sendUpdateToClients() {
 		List<Messenger> toRemove = new ArrayList<Messenger>();
 		synchronized (mClients) {
 			for (Messenger client : mClients) {
 				Message msg = Message.obtain(null, MSG_SERVICE_STATUS);
-				Bundle b = compileUpdateBundle();
-				msg.setData(b);
 				try {
 					client.send(msg);
 				} catch (RemoteException e) {
@@ -488,9 +446,7 @@ public class MusicPlaybackService extends Service {
 	}
 
 	private void sendUpdateToWidgets() {
-		Bundle b = compileUpdateBundle();
 		Intent intent = new Intent(PlayerControlWidgetProvider.ACTION_PLAYBACK_STATUS_CHANGED);
-		intent.putExtra("updateInfo", b);
 		getApplicationContext().sendBroadcast(intent);
 	}
 
@@ -561,11 +517,13 @@ public class MusicPlaybackService extends Service {
 			Log.w(TAG, "Failed to close the file");
 			e.printStackTrace();
 		}
-		songAbsoluteFileNamesPosition = songAbsoluteFileNamesPosition - 1;
-		if (songAbsoluteFileNamesPosition < 0) {
-			songAbsoluteFileNamesPosition = songAbsoluteFileNames.length - 1;
+		PlaybackInfoHolder pih = PlaybackInfoHolder.getInstance();
+		String next;
+		synchronized (pih) {
+			Playlist playlist = pih.getActivePlaylist();
+			playlist.previous();
+			next = playlist.getPlaying().getFileName();
 		}
-		String next = songAbsoluteFileNames[songAbsoluteFileNamesPosition];
 		try {
 			songFile = new File(next);
 			fis = new FileInputStream(songFile);
@@ -685,48 +643,6 @@ public class MusicPlaybackService extends Service {
 		updateNotification();
 	}
 
-	/**
-	 *
-	 */
-	private void resetShuffle(){
-		synchronized(shuffleFrontList){
-			shuffleFrontList.clear();
-			shuffleBackList.clear();
-			for(int i = 0;i < songAbsoluteFileNames.length;i++){
-				shuffleFrontList.add(i);
-			}
-		}
-	}
-
-	// Props to this fellow: https://stackoverflow.com/questions/5467174/how-to-implement-a-repeating-shuffle-thats-random-but-not-too-random
-	private int grabNextShuffledPosition(){
-		synchronized(shuffleFrontList){
-			int threshold = (int) Math.ceil((songAbsoluteFileNames.length + 1) / 2);
-			Log.d(TAG, "threshold: " + threshold);
-			if(shuffleFrontList.size() < threshold){
-				Log.d(TAG, "Shuffle queue is half empty, adding a new song...");
-				shuffleFrontList.add(shuffleBackList.get(0));
-				shuffleBackList.remove(0);
-			}
-			int rand = Math.abs(random.nextInt()) % shuffleFrontList.size();
-			int loc = shuffleFrontList.get(rand);
-			shuffleFrontList.remove(rand);
-			shuffleBackList.add(loc);
-			Log.i(TAG, "next position is: " + loc);
-			String front = "";
-			String back = "";
-			for(int i : shuffleFrontList){
-				front = front + "," + i;
-			}
-			for(int i : shuffleBackList){
-				back = back + "," + i;
-			}
-			Log.i(TAG, "Front list = " + front);
-			Log.i(TAG, "Back list = " + back);
-			return loc;
-		}
-	}
-
 	private synchronized void next() {
 		mp.stop();
 		mp.reset();
@@ -736,14 +652,16 @@ public class MusicPlaybackService extends Service {
 			Log.w(TAG, "Failed to close the file");
 			e.printStackTrace();
 		}
-
-		if(!this._shuffle){
-			songAbsoluteFileNamesPosition = (songAbsoluteFileNamesPosition + 1)
-					% songAbsoluteFileNames.length;
-		} else {
-			songAbsoluteFileNamesPosition = grabNextShuffledPosition();
+		PlaybackInfoHolder pih = PlaybackInfoHolder.getInstance();
+		String next;
+		synchronized (pih) {
+			if (pih.getActivePlaylist() == null) {
+				return;
+			}
+			Playlist playlist = pih.getActivePlaylist();
+			playlist.next();
+			next = playlist.getPlaying().getFileName();
 		}
-		String next = songAbsoluteFileNames[songAbsoluteFileNamesPosition];
 		try {
 			songFile = new File(next);
 			fis = new FileInputStream(songFile);
@@ -761,7 +679,10 @@ public class MusicPlaybackService extends Service {
 	}
 
 	public void toggleShuffle() {
-		this._shuffle = !this._shuffle ;
+		PlaybackInfoHolder pih = PlaybackInfoHolder.getInstance();
+		synchronized (pih) {
+			pih.getActivePlaylist().toggleShuffling();
+		}
 	}
 
 	private void updateNotification() {
@@ -773,9 +694,6 @@ public class MusicPlaybackService extends Service {
 		// NowPlaying if one already exists.
 		resultIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		resultIntent.putExtra("From_Notification", true);
-		resultIntent.putExtra(AlbumList.ALBUM_NAME, album);
-		resultIntent.putExtra(ArtistList.ARTIST_NAME, artist);
-		resultIntent.putExtra(ArtistList.ARTIST_ABS_PATH_NAME, artistAbsPath);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
 				resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -785,14 +703,15 @@ public class MusicPlaybackService extends Service {
 		int icon = R.drawable.ic_pgmp_launcher;
 		String contentText = getResources().getString(R.string.ticker_text);
 		if (songFile != null) {
-			SharedPreferences prefs = getSharedPreferences(
-					"PrettyGoodMusicPlayer", MODE_PRIVATE);
-			prefs.edit();
-			File bestGuessMusicDir = Utils.getBestGuessMusicDirectory();
-			String musicRoot = prefs.getString("ARTIST_DIRECTORY",
-					bestGuessMusicDir.getAbsolutePath());
-			contentText = Utils.getArtistName(songFile, musicRoot) + ": "
-					+ Utils.getPrettySongName(songFile);
+			PlaybackInfoHolder pih = PlaybackInfoHolder.getInstance();
+			String artist;
+			String songName;
+			synchronized (pih) {
+				Playlist.Song song = pih.getActivePlaylist().getPlaying();
+				artist = song.getArtist();
+				songName = song.getSong();
+			}
+			contentText = artist + ": " + songName;
 			if (mp != null) {
 				if (mp.isPlaying()) {
 					icon = R.drawable.ic_pgmp_launcher;

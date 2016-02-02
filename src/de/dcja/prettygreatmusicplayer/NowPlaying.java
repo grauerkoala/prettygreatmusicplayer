@@ -18,8 +18,6 @@
 
 package de.dcja.prettygreatmusicplayer;
 
-import java.util.Locale;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -38,7 +36,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +48,8 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 public class NowPlaying extends Activity {
 
@@ -83,34 +82,8 @@ public class NowPlaying extends Activity {
 
 		Intent originIntent = getIntent();
 		if(originIntent.getBooleanExtra("From_Notification", false)){
-
-			String artistName = originIntent.getStringExtra(ArtistList.ARTIST_NAME);
-			String artistAbsPath = originIntent.getStringExtra(ArtistList.ARTIST_ABS_PATH_NAME);
-			if(artistName != null && artistAbsPath != null){
-				Log.i(TAG, "Now Playing was launched from a notification, setting up its back stack");
-				// Reference: https://developer.android.com/reference/android/app/TaskStackBuilder.html
-				TaskStackBuilder tsb = TaskStackBuilder.create(this);
-				Intent intent = new Intent(this, ArtistList.class);
-				tsb.addNextIntent(intent);
-
-				intent = new Intent(this, AlbumList.class);
-				intent.putExtra(ArtistList.ARTIST_NAME, artistName);
-				intent.putExtra(ArtistList.ARTIST_ABS_PATH_NAME, artistAbsPath);
-				tsb.addNextIntent(intent);
-
-				String albumName =  originIntent.getStringExtra(AlbumList.ALBUM_NAME);
-				if(albumName != null){
-					intent = new Intent(this, SongList.class);
-					intent.putExtra(AlbumList.ALBUM_NAME, albumName);
-					intent.putExtra(ArtistList.ARTIST_NAME, artistName);
-					intent.putExtra(ArtistList.ARTIST_ABS_PATH_NAME, artistAbsPath);
-					tsb.addNextIntent(intent);
-				}
-				intent = new Intent(this, NowPlaying.class);
-				tsb.addNextIntent(intent);
-				tsb.startActivities();
-			}
-
+			// There used to be backstack management here, however, since the general concept of
+			// file management changed, that management no longer works out.
 		}
 
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -390,10 +363,6 @@ public class NowPlaying extends Activity {
 					Message msg = Message.obtain(null, MusicPlaybackService.MSG_SET_PLAYLIST);
 					msg.getData().putStringArray(SongList.SONG_ABS_FILE_NAME_LIST, desiredSongAbsFileNames);
 					msg.getData().putInt(SongList.SONG_ABS_FILE_NAME_LIST_POSITION, desiredAbsSongFileNamesPosition);
-					msg.getData().putString(ArtistList.ARTIST_NAME, desiredArtistName);
-					msg.getData().putString(ArtistList.ARTIST_ABS_PATH_NAME, desiredArtistAbsPath);
-					msg.getData().putString(AlbumList.ALBUM_NAME, desiredAlbumName);
-					msg.getData().putInt(MusicPlaybackService.TRACK_POSITION, desiredSongProgress);
 					try {
 						Log.i(TAG, "Sending a playlist!");
 						mService.send(msg);
@@ -433,31 +402,49 @@ public class NowPlaying extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MusicPlaybackService.MSG_SERVICE_STATUS:
-				String currentSongName = msg.getData().getString(MusicPlaybackService.PRETTY_SONG_NAME);
+				PlaybackInfoHolder pih = PlaybackInfoHolder.getInstance();
+
+				String currentSongName = "";
+				String currentAlbumName = "";
+				String currentArtistName = "";
+				boolean isShuffling = false;
+				MusicPlaybackService.PlaybackState state = MusicPlaybackService.PlaybackState.UNKNOWN;
+				int duration = -1;
+				int position = -1;
+				synchronized (pih) {
+					Playlist playlist = pih.getActivePlaylist();
+					if (playlist != null) {
+						Playlist.Song song = playlist.getPlaying();
+						currentAlbumName = song.getAlbum();
+						currentArtistName = song.getArtist();
+						currentSongName = song.getSong();
+						isShuffling = playlist.isShuffling();
+						state = pih.getPlaybackState();
+						duration = pih.getTrackDuration();
+						position = pih.getTrackPosition();
+					}
+				}
+
 				TextView tv = (TextView) _activity.findViewById(R.id.songName);
 				if(!tv.getText().equals(currentSongName)){
 					tv.setText(currentSongName);
 				}
 
-				String currentAlbumName = msg.getData().getString(MusicPlaybackService.PRETTY_ALBUM_NAME);
 				tv = (TextView) _activity.findViewById(R.id.albumName);
 				if(!tv.getText().equals(currentAlbumName)){
 					tv.setText(currentAlbumName);
 				}
 
-				String currentArtistName = msg.getData().getString(MusicPlaybackService.PRETTY_ARTIST_NAME);
 				tv = (TextView) _activity.findViewById(R.id.artistName);
 				if(!tv.getText().equals(currentArtistName)){
 					tv.setText(currentArtistName);
 				}
 
-				boolean isShuffling = msg.getData().getBoolean(MusicPlaybackService.IS_SHUFFLING);
 				ImageButton shuffle = (ImageButton)_activity.findViewById(R.id.shuffle);
 				if(shuffle.isSelected() != isShuffling){
 					shuffle.setSelected(isShuffling);
 				}
 
-				MusicPlaybackService.PlaybackState state = MusicPlaybackService.PlaybackState.values()[msg.getData().getInt(MusicPlaybackService.PLAYBACK_STATE, 0)];
 				ImageButton playPause = (ImageButton)_activity.findViewById(R.id.playPause);
 				if(playPause.getContentDescription().equals(_activity.getResources().getString(R.string.play))){
 					if(state == MusicPlaybackService.PlaybackState.PLAYING){
@@ -470,8 +457,6 @@ public class NowPlaying extends Activity {
 						playPause.setContentDescription(_activity.getResources().getString(R.string.play));
 					}
 				}
-				int duration = msg.getData().getInt(MusicPlaybackService.TRACK_DURATION, -1);
-				int position = msg.getData().getInt(MusicPlaybackService.TRACK_POSITION, -1);
 				if(duration > 0){
 					if(!_activity.userDraggingProgress){
 						SeekBar seekBar = (SeekBar)_activity.findViewById(R.id.songProgressBar);
