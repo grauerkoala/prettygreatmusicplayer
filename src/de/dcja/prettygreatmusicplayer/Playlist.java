@@ -28,6 +28,10 @@ public class Playlist {
         playlist = new ArrayList<>();
         playorder = new ArrayList<>();
 
+        if (songs != null) {
+            appendSongs(songs);
+        }
+
         shuffling = false;
 
         position = -1;
@@ -113,6 +117,9 @@ public class Playlist {
     public int peekPrevious() {
         if (playlist.size() == 0) {
             return -1;
+        }
+        if (position < 0) {
+            position = 0;
         }
         int pos = (position - 1) % playlist.size();
         return (shuffling ? playorder : playlist).get(pos).position;
