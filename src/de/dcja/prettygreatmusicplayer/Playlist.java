@@ -1,6 +1,8 @@
 package de.dcja.prettygreatmusicplayer;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -190,7 +192,9 @@ public class Playlist {
 
     public static Playlist getPlaylistForFilePaths(Context context, String[] filePaths) {
         Playlist playlist = new Playlist();
-        MusicInfoRetriever musicInfoRetriever = new MusicInfoRetriever(context, false); // TODO: Make fallback to file parameter dependent on settings
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean fallbackToFile = prefs.getBoolean("pref_metadata_fallback_to_file", false);
+        MusicInfoRetriever musicInfoRetriever = new MusicInfoRetriever(context, fallbackToFile);
 
         for (String filePath : filePaths) {
             musicInfoRetriever.setDataSource(filePath);
