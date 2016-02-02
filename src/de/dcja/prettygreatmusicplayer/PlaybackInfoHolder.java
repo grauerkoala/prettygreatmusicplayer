@@ -15,7 +15,7 @@ public class PlaybackInfoHolder {
         playbackState = null;
     }
 
-    public PlaybackInfoHolder getInstance() {
+    public static PlaybackInfoHolder getInstance() {
         if (instance == null) {
             instance = new PlaybackInfoHolder();
         }
